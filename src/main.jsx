@@ -6,7 +6,7 @@ import App from './App.jsx';
 import SWRProvider from './services/SWRProvider';
 
 // Auth Provider
-import { AuthProvider } from '@/context/isAuth';
+import { AuthProvider } from '@/context/auth-context';
 
 createRoot(document.getElementById('root')).render(
   <SWRProvider>

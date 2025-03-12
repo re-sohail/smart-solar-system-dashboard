@@ -2,11 +2,11 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Navigate } from 'react-router-dom';
 
-// const API_BASE_URL = import.meta.env.VITE_API_URL;
+const baseURL = 'https://smart-solar-system-backend.onrender.com/api/v1';
 
 const api = axios.create({
-  baseURL: 'http://localhost:4000/api/v1',
-  timeout: 20000,
+  baseURL: baseURL,
+  timeout: 300000,
 });
 
 api.interceptors.request.use(

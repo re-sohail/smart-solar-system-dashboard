@@ -10,7 +10,7 @@ import Cookies from 'js-cookie';
 
 import { useNavigate } from 'react-router-dom';
 
-import { useAuth } from '@/context/isAuth';
+import { useAuth } from '@/context/auth-context';
 
 // Define Yup validation schema for the form
 const schema = yup.object().shape({

@@ -5,7 +5,7 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 
 // Global Context
-import { useAuth } from '@/context/isAuth';
+import { useAuth } from '@/context/auth-context';
 
 // UI Components
 import Loader from './components/loader/loader';
