@@ -5,8 +5,13 @@ import App from './App.jsx';
 // SWR Config Provider
 import SWRProvider from './services/SWRProvider';
 
+// Auth Provider
+import { AuthProvider } from '@/context/isAuth';
+
 createRoot(document.getElementById('root')).render(
   <SWRProvider>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </SWRProvider>,
 );
