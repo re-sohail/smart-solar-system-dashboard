@@ -473,14 +473,14 @@ const ProductsPage = () => {
                       required
                       value={mainImageUrl}
                       onChange={e => setMainImageUrl(e.target.value)}
-                      placeholder="https://example.com/image.jpg"
+                      placeholder='https://example.com/image.jpg'
                       className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
                     />
                   </div>
                   <div>
                     <label className='block text-sm font-medium text-gray-700 mb-1'>Additional Image URLs</label>
                     {additionalImageUrls.map((url, index) => (
-                      <div key={index} className="flex gap-2 mb-2">
+                      <div key={index} className='flex gap-2 mb-2'>
                         <input
                           type='url'
                           value={url}
@@ -489,25 +489,25 @@ const ProductsPage = () => {
                             newUrls[index] = e.target.value;
                             setAdditionalImageUrls(newUrls);
                           }}
-                          placeholder="https://example.com/image.jpg"
+                          placeholder='https://example.com/image.jpg'
                           className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
                         />
                         {index === additionalImageUrls.length - 1 ? (
                           <button
-                            type="button"
+                            type='button'
                             onClick={() => setAdditionalImageUrls([...additionalImageUrls, ''])}
-                            className="bg-blue-500 text-white p-2 rounded-lg"
+                            className='bg-blue-500 text-white p-2 rounded-lg'
                           >
                             +
                           </button>
                         ) : (
                           <button
-                            type="button"
+                            type='button'
                             onClick={() => {
                               const newUrls = additionalImageUrls.filter((_, i) => i !== index);
                               setAdditionalImageUrls(newUrls);
                             }}
-                            className="bg-red-500 text-white p-2 rounded-lg"
+                            className='bg-red-500 text-white p-2 rounded-lg'
                           >
                             -
                           </button>
