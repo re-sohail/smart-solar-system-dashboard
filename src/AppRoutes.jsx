@@ -9,18 +9,18 @@ import { useAuth } from '@/context/auth-context';
 
 // UI Components
 import Loader from './components/loader/loader';
+import ServicesPage from './pages/ServicesPage';
+import ServicesDetailPage from './pages/ServicesDetailPage';
 
 // Lazy Loaded Components
 const Login = lazy(() => import('./pages/LoginPage'));
 const Layout = lazy(() => import('./layouts/Layout'));
-const Dashboard = lazy(() => import('./pages/DashboardPage'));
 const Users = lazy(() => import('./pages/UsersPage'));
 const UserDetail = lazy(() => import('./pages/UserDetailPage'));
 const Products = lazy(() => import('./pages/ProductsPage'));
 const ProductDetail = lazy(() => import('./pages/ProductDetailPage'));
 const Orders = lazy(() => import('./pages/OrdersPage'));
 const OrderDetail = lazy(() => import('./pages/OrderDetailPage'));
-const Categories = lazy(() => import('./pages/CategoriesPage'));
 const NotFound = lazy(() => import('./pages/NotFoundPage'));
 
 //  Protected Routes Functionality
@@ -46,7 +46,7 @@ const UnathenicatedRoute = () => {
   console.log('isAuth', isAuth);
 
   if (isAuth) {
-    return <Navigate to='/dashboard' replace />;
+    return <Navigate to='/dashboard/users' replace />;
   }
 
   return (
@@ -65,28 +65,24 @@ const AppRoutes = () => {
           <Route path='/login' element={<Login />} />
         </Route>
 
-        {/* redirect to Dashboard */}
-        <Route path='/' element={<Navigate to={'/dashboard'} />} />
+        {/* Redirect to Dashboard */}
+        <Route path='/' element={<Navigate to='/dashboard/users' replace />} />
 
-        {/* Protected Route */}
+        {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path='/dashboard' element={<Layout />}>
-            <Route index element={<Dashboard />} />
-
-            {/* Users Routes */}
+            {/* Nested Routes */}
             <Route path='users' element={<Users />} />
             <Route path='users/:userId' element={<UserDetail />} />
 
-            {/* Products Route */}
             <Route path='products' element={<Products />} />
             <Route path='products/:productId' element={<ProductDetail />} />
 
-            {/* Orders Routes */}
+            <Route path='services' element={<ServicesPage />} />
+            <Route path='services/:serviceId' element={<ServicesDetailPage />} />
+
             <Route path='orders' element={<Orders />} />
             <Route path='orders/:orderId' element={<OrderDetail />} />
-
-            {/* Categories Route */}
-            <Route path='categories' element={<Categories />} />
           </Route>
         </Route>
 

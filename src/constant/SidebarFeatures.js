@@ -3,11 +3,6 @@ import { Home, Users, Package, ShoppingCart, List } from 'lucide-react';
 
 export const SidebarFeatures = [
   {
-    name: 'Dashboard',
-    icon: Home,
-    link: '/dashboard',
-  },
-  {
     name: 'Users',
     icon: Users,
     link: '/dashboard/users',
@@ -18,13 +13,13 @@ export const SidebarFeatures = [
     link: '/dashboard/products',
   },
   {
+    name: 'Services',
+    icon: List,
+    link: '/dashboard/services',
+  },
+  {
     name: 'Orders',
     icon: ShoppingCart,
     link: '/dashboard/orders',
-  },
-  {
-    name: 'Categories',
-    icon: List,
-    link: '/dashboard/categories',
   },
 ];

@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Navigate } from 'react-router-dom';
 
-const baseURL = 'https://smart-solar-system-backend.onrender.com/api/v1';
+const baseURL = 'https://solar-system-backend.vercel.app/api';
 
 const api = axios.create({
   baseURL: baseURL,

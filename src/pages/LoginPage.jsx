@@ -15,14 +15,7 @@ import { useAuth } from '@/context/auth-context';
 // Define Yup validation schema for the form
 const schema = yup.object().shape({
   email: yup.string().email('Email is invalid').required('Email is required'),
-  password: yup
-    .string()
-    .required('Password is required')
-    .min(8, 'Password must be at least 8 characters')
-    .matches(
-      /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
-      'Password must include uppercase, lowercase, number and special character',
-    ),
+  password: yup.string().required('Password is required').min(4, 'Password must be at least 4 characters'),
 });
 
 const Login = () => {
@@ -58,12 +51,15 @@ const Login = () => {
 
     try {
       // Place your login API call logic here
-      let response = await api.post('/auth/login', { email, password });
+      let response = await api.post('/users/login', { email, password });
       console.log('Login response:', response);
       if (response.status === 200) {
-        let token = response?.data?.data?.token;
-        login(token, { expires: 7, secure: true });
-        Navigate('/dashboard');
+        let token = response?.data.token;
+        let isAdmin = response.data.isAdmin;
+        if (isAdmin) {
+          login(token, { expires: 7, secure: true });
+          Navigate('/dashboard');
+        }
       }
     } catch (error) {
       setLoginError('An error occurred. Please try again.');
