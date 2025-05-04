@@ -17,17 +17,33 @@ const ProductDetailPage = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   // Image upload states
-  const [newMainImage, setNewMainImage] = useState(null);
-  const [newAdditionalImages, setNewAdditionalImages] = useState([]);
+  const [newMainImageUrl, setNewMainImageUrl] = useState('');
+  const [newAdditionalImageUrls, setNewAdditionalImageUrls] = useState(['']);
+  const [showAddImageField, setShowAddImageField] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
         const response = await api.get(`/products/${productId}`);
-        setProduct(response.data);
-        setEditedProduct(response.data);
-        setNewStock(response.data.stock.toString());
+
+        // Handle the response which may be an array or a single product
+        let productData;
+        if (Array.isArray(response.data)) {
+          // If it's an array, take the first item
+          productData = response.data[0];
+        } else {
+          // Otherwise, use the object directly
+          productData = response.data;
+        }
+
+        if (!productData) {
+          throw new Error('Product not found');
+        }
+
+        setProduct(productData);
+        setEditedProduct(productData);
+        setNewStock(productData.stock.toString());
       } catch (err) {
         setError('Failed to fetch product details');
         console.error(err);
@@ -64,33 +80,32 @@ const ProductDetailPage = () => {
     }
   };
 
-  const uploadImage = async file => {
-    // Here you would add your Cloudinary upload logic
-    // For now, returning a placeholder URL
-    return 'https://example.com/uploaded-image.jpg';
-  };
-
   const handleSaveChanges = async () => {
     try {
       let updatedProductData = { ...editedProduct };
 
-      // Upload new main image if provided
-      if (newMainImage) {
-        const mainImageUrl = await uploadImage(newMainImage);
-        updatedProductData.imageUrl = mainImageUrl;
+      // Use the provided image URL directly if a new one was entered
+      if (newMainImageUrl.trim() !== '') {
+        updatedProductData.imageUrl = newMainImageUrl;
       }
 
-      // Upload new additional images if provided
-      if (newAdditionalImages.length > 0) {
-        const additionalImageUrls = await Promise.all(newAdditionalImages.map(img => uploadImage(img)));
-        updatedProductData.additionalImages = [...(updatedProductData.additionalImages || []), ...additionalImageUrls];
+      // Add any new additional image URLs that aren't empty
+      if (newAdditionalImageUrls.length > 0) {
+        const validAdditionalUrls = newAdditionalImageUrls.filter(url => url.trim() !== '');
+        if (validAdditionalUrls.length > 0) {
+          updatedProductData.additionalImages = [
+            ...(updatedProductData.additionalImages || []),
+            ...validAdditionalUrls,
+          ];
+        }
       }
 
       const response = await api.put(`/products/${productId}`, updatedProductData);
       setProduct(response.data);
       setEditMode(false);
-      setNewMainImage(null);
-      setNewAdditionalImages([]);
+      setNewMainImageUrl('');
+      setNewAdditionalImageUrls(['']);
+      setShowAddImageField(false);
       alert('Product updated successfully');
     } catch (err) {
       setError('Failed to update product');
@@ -104,6 +119,15 @@ const ProductDetailPage = () => {
       updatedImages.splice(index, 1);
       setEditedProduct({ ...editedProduct, additionalImages: updatedImages });
     }
+  };
+
+  const displayImage = () => {
+    if (activeImageIndex === -1) {
+      return product.imageUrl;
+    } else if (product.additionalImages && product.additionalImages.length > activeImageIndex) {
+      return product.additionalImages[activeImageIndex];
+    }
+    return product.imageUrl;
   };
 
   if (loading) return <div className='flex justify-center items-center h-screen'>Loading product details...</div>;
@@ -164,7 +188,7 @@ const ProductDetailPage = () => {
           <div>
             <div className='bg-gray-100 rounded-lg overflow-hidden mb-4 aspect-w-4 aspect-h-3'>
               <img
-                src={editMode && newMainImage ? URL.createObjectURL(newMainImage) : product.imageUrl}
+                src={editMode && newMainImageUrl ? newMainImageUrl : displayImage()}
                 alt={product.name}
                 className='w-full h-[400px] object-contain'
                 onError={e => {
@@ -205,34 +229,63 @@ const ProductDetailPage = () => {
 
               {editMode && (
                 <>
-                  <label
-                    htmlFor='main-image-upload'
-                    className='flex flex-col items-center justify-center w-24 h-24 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50'
-                  >
-                    <FiImage size={24} className='text-gray-400' />
-                    <span className='text-xs text-gray-500'>Main</span>
-                    <input
-                      id='main-image-upload'
-                      type='file'
-                      className='hidden'
-                      onChange={e => setNewMainImage(e.target.files[0])}
-                    />
-                  </label>
+                  <div className='mt-4'>
+                    <div className='mb-4'>
+                      <label className='block text-sm font-medium text-gray-700 mb-1'>New Main Image URL</label>
+                      <input
+                        type='url'
+                        value={newMainImageUrl}
+                        onChange={e => setNewMainImageUrl(e.target.value)}
+                        placeholder='https://example.com/image.jpg'
+                        className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                      />
+                    </div>
 
-                  <label
-                    htmlFor='additional-images-upload'
-                    className='flex flex-col items-center justify-center w-24 h-24 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50'
-                  >
-                    <FiImage size={24} className='text-gray-400' />
-                    <span className='text-xs text-gray-500'>Additional</span>
-                    <input
-                      id='additional-images-upload'
-                      type='file'
-                      multiple
-                      className='hidden'
-                      onChange={e => setNewAdditionalImages(Array.from(e.target.files))}
-                    />
-                  </label>
+                    {showAddImageField ? (
+                      <div className='mb-4'>
+                        <label className='block text-sm font-medium text-gray-700 mb-1'>Additional Image URLs</label>
+                        {newAdditionalImageUrls.map((url, index) => (
+                          <div key={index} className='flex gap-2 mb-2'>
+                            <input
+                              type='url'
+                              value={url}
+                              onChange={e => {
+                                const newUrls = [...newAdditionalImageUrls];
+                                newUrls[index] = e.target.value;
+                                setNewAdditionalImageUrls(newUrls);
+                              }}
+                              placeholder='https://example.com/image.jpg'
+                              className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                            />
+                            {index === newAdditionalImageUrls.length - 1 ? (
+                              <button
+                                type='button'
+                                onClick={() => setNewAdditionalImageUrls([...newAdditionalImageUrls, ''])}
+                                className='bg-blue-500 text-white p-2 rounded-lg'
+                              >
+                                +
+                              </button>
+                            ) : (
+                              <button
+                                type='button'
+                                onClick={() => {
+                                  const newUrls = newAdditionalImageUrls.filter((_, i) => i !== index);
+                                  setNewAdditionalImageUrls(newUrls);
+                                }}
+                                className='bg-red-500 text-white p-2 rounded-lg'
+                              >
+                                -
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <button onClick={() => setShowAddImageField(true)} className='text-blue-600 hover:text-blue-800'>
+                        + Add Additional Images
+                      </button>
+                    )}
+                  </div>
                 </>
               )}
             </div>

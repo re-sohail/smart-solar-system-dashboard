@@ -32,8 +32,9 @@ const ProductsPage = () => {
     stock: '',
     installationGuide: '',
   });
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [additionalImages, setAdditionalImages] = useState([]);
+  // Replace file states with URL states
+  const [mainImageUrl, setMainImageUrl] = useState('');
+  const [additionalImageUrls, setAdditionalImageUrls] = useState(['']);
 
   // Fetch products, categories and brands on component mount
   useEffect(() => {
@@ -148,27 +149,15 @@ const ProductsPage = () => {
     }
   };
 
-  // Upload image to Cloudinary
-  const uploadImage = async file => {
-    // Here you would add your Cloudinary upload logic
-    // For now, returning a placeholder URL
-    return 'https://example.com/uploaded-image.jpg';
-  };
-
   // Handle adding a new product
   const handleAddProduct = async e => {
     e.preventDefault();
     try {
-      // Upload main image
-      const mainImageUrl = await uploadImage(selectedImage);
-
-      // Upload additional images
-      const additionalImageUrls = await Promise.all(additionalImages.map(img => uploadImage(img)));
-
+      // Use the provided image URLs directly instead of uploading
       const productData = {
         ...newProduct,
         imageUrl: mainImageUrl,
-        additionalImages: additionalImageUrls,
+        additionalImages: additionalImageUrls.filter(url => url.trim() !== ''),
         price: parseFloat(newProduct.price),
         stock: parseInt(newProduct.stock),
       };
@@ -197,8 +186,8 @@ const ProductsPage = () => {
       stock: '',
       installationGuide: '',
     });
-    setSelectedImage(null);
-    setAdditionalImages([]);
+    setMainImageUrl('');
+    setAdditionalImageUrls(['']);
   };
 
   // Filter products by search term - Make sure products is an array first
@@ -478,22 +467,53 @@ const ProductsPage = () => {
                     ></textarea>
                   </div>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>Main Image*</label>
+                    <label className='block text-sm font-medium text-gray-700 mb-1'>Main Image URL*</label>
                     <input
-                      type='file'
+                      type='url'
                       required
-                      onChange={e => setSelectedImage(e.target.files[0])}
+                      value={mainImageUrl}
+                      onChange={e => setMainImageUrl(e.target.value)}
+                      placeholder="https://example.com/image.jpg"
                       className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
                     />
                   </div>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>Additional Images</label>
-                    <input
-                      type='file'
-                      multiple
-                      onChange={e => setAdditionalImages(Array.from(e.target.files))}
-                      className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                    />
+                    <label className='block text-sm font-medium text-gray-700 mb-1'>Additional Image URLs</label>
+                    {additionalImageUrls.map((url, index) => (
+                      <div key={index} className="flex gap-2 mb-2">
+                        <input
+                          type='url'
+                          value={url}
+                          onChange={e => {
+                            const newUrls = [...additionalImageUrls];
+                            newUrls[index] = e.target.value;
+                            setAdditionalImageUrls(newUrls);
+                          }}
+                          placeholder="https://example.com/image.jpg"
+                          className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        />
+                        {index === additionalImageUrls.length - 1 ? (
+                          <button
+                            type="button"
+                            onClick={() => setAdditionalImageUrls([...additionalImageUrls, ''])}
+                            className="bg-blue-500 text-white p-2 rounded-lg"
+                          >
+                            +
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newUrls = additionalImageUrls.filter((_, i) => i !== index);
+                              setAdditionalImageUrls(newUrls);
+                            }}
+                            className="bg-red-500 text-white p-2 rounded-lg"
+                          >
+                            -
+                          </button>
+                        )}
+                      </div>
+                    ))}
                   </div>
                   <div className='md:col-span-2'>
                     <label className='block text-sm font-medium text-gray-700 mb-1'>Installation Guide URL</label>

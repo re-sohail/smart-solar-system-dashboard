@@ -38,7 +38,7 @@ const Layout = () => {
             </Button>
           </div>
         </div>
-        <div className='w-full h-[calc(100%-65px)] p-6'>
+        <div className='w-full h-[calc(100%-65px)] overflow-y-auto p-6'>
           <Outlet />
         </div>
       </main>
